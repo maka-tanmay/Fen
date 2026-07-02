@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>fen — foundation for enduring networks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ivory:#EDF0E9;
+    --card:#E1E7DC;
+    --card-line:#C9D2C2;
+    --ink:#1D231E;
+    --ink-soft:#4B5346;
+    --ink-faint:#7C8578;
+    --sage:#4C6A57;
+    --sage-deep:#28392E;
+    --sage-pale:#D2DDCC;
+    --terra:#95462A;
+    --terra-deep:#5A2717;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation:none !important; transition:none !important;} }
+
+  body{
+    margin:0;
+    background:var(--ivory);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:'Fraunces', serif; margin:0; font-weight:500; letter-spacing:-0.01em;}
+  p{margin:0;}
+  a{color:inherit;}
+  :focus-visible{outline:2px solid var(--sage-deep); outline-offset:3px;}
+
+  .wrap{max-width:1080px; margin:0 auto; padding:0 32px;}
+  @media (max-width:640px){ .wrap{padding:0 20px;} }
+
+  /* nav */
+  nav{padding:28px 0; border-bottom:1px solid var(--card-line);}
+  nav .wrap{display:flex; align-items:baseline; justify-content:space-between; gap:12px;}
+  .wordmark{display:flex; align-items:baseline; gap:10px;}
+  .wordmark .mark{font-size:24px; font-weight:600; color:var(--ink);}
+  .wordmark .full{font-size:11px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.09em; font-family:'Inter',sans-serif; font-weight:500;}
+  .nav-note{font-size:12px; color:var(--ink-faint); font-family:'Inter',sans-serif;}
+
+  /* hero */
+  .hero{padding:88px 0 64px;}
+  .eyebrow{font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--sage-deep); font-weight:600; margin-bottom:20px;}
+  .hero h1{font-size:52px; line-height:1.12; max-width:760px; margin-bottom:24px;}
+  @media (max-width:640px){ .hero h1{font-size:34px;} }
+  .hero .sub{font-size:18px; color:var(--ink-soft); max-width:540px; margin-bottom:40px;}
+
+  /* signature graphic: two diverging pulses meeting at the fen mark */
+  .pulse-wrap{margin:0 0 8px; border:1px solid var(--card-line); background:var(--card); border-radius:4px; padding:28px 24px 20px;}
+  .pulse-legend{display:flex; gap:28px; margin-top:16px; font-size:12px; color:var(--ink-soft); flex-wrap:wrap;}
+  .pulse-legend span{display:inline-flex; align-items:center; gap:7px;}
+  .dot{width:8px; height:8px; border-radius:50%; display:inline-block;}
+
+  /* cost of doing nothing — scroller */
+  .cost-inner{max-width:1080px; margin:0 auto; padding:0 32px; display:grid; grid-template-columns:340px 1fr; gap:56px;}
+  @media (max-width:860px){ .cost-inner{grid-template-columns:1fr; padding:0 20px;} }
+  .cost-visual{position:sticky; top:96px; align-self:start; padding-top:64px;}
+  @media (max-width:860px){ .cost-visual{position:static; padding-top:32px;} }
+  .cost-eyebrow{font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--terra-deep); font-weight:600; margin-bottom:18px;}
+  .dot-grid{display:grid; grid-template-columns:repeat(6,1fr); gap:9px; max-width:270px; margin-bottom:28px;}
+  .dot{aspect-ratio:1; border-radius:50%; background:var(--sage-pale); border:1.5px solid var(--sage); transition:background 0.5s ease, border-color 0.5s ease, opacity 0.5s ease, transform 0.45s cubic-bezier(.34,1.56,.64,1), box-shadow 0.5s ease;}
+  .dot.drift{background:var(--terra); border-color:var(--terra-deep); opacity:0.85; transform:scale(1.14); animation:dotBreathe 2.2s ease-in-out infinite;}
+  .dot.flagged{background:var(--sage-pale); border-color:var(--terra); border-width:2px; transform:scale(1.06); animation:dotBreathe 2.2s ease-in-out infinite;}
+  .dot.drift.flagged{border-color:var(--ink); border-width:2.5px;}
+  @keyframes dotBreathe{
+    0%, 100%{ box-shadow:0 0 0 0 rgba(149,70,42,0); }
+    50%{ box-shadow:0 0 0 7px rgba(149,70,42,0.14); }
+  }
+  .cost-unit{font-size:11.5px; color:var(--ink-faint); margin-top:10px; font-style:italic;}
+  .cost-stat{font-family:'Fraunces', serif; font-size:38px; color:var(--ink); transition:opacity 0.3s ease, transform 0.3s ease;}
+  .cost-stat.pop{opacity:0; transform:translateY(6px);}
+  .cost-caption{font-size:13.5px; color:var(--ink-soft); margin-top:8px; max-width:270px; line-height:1.55;}
+
+  .cost-steps{padding:8px 0 40px;}
+  .cost-step{min-height:56vh; display:flex; flex-direction:column; justify-content:center; padding:32px 0; opacity:0.32; transition:opacity 0.5s ease;}
+  .cost-step.active{opacity:1;}
+  .cost-step h3{font-size:25px; max-width:420px; margin-bottom:12px;}
+  .cost-step p{font-size:15px; color:var(--ink-soft); max-width:420px;}
+  .cost-step .src{font-size:12px; color:var(--ink-faint); margin-top:10px; font-style:italic;}
+
+  /* client list — sorted by relationship */
+  .roster-section{padding:72px 0; border-bottom:1px solid var(--card-line);}
+  .roster-section .label{font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--sage-deep); font-weight:600; margin-bottom:14px;}
+  .roster-section h2{font-size:28px; max-width:600px; margin-bottom:12px;}
+  .roster-section p.lead{font-size:15px; color:var(--ink-soft); max-width:540px; margin-bottom:32px;}
+
+  .roster-card{border:1px solid var(--card-line); border-radius:4px; background:var(--card); overflow:hidden;}
+  .roster-head{display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--card-line); flex-wrap:wrap; gap:12px;}
+  .roster-head .title{font-size:13px; font-weight:600; color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.03em;}
+  .sort-toggle{display:inline-flex; border:1px solid var(--card-line); border-radius:4px; overflow:hidden;}
+  .sort-toggle button{font-family:'Inter',sans-serif; font-size:12.5px; font-weight:500; padding:7px 14px; border:none; background:var(--ivory); color:var(--ink-soft); cursor:pointer;}
+  .sort-toggle button.active{background:var(--sage-deep); color:var(--ivory);}
+  .roster-rows{display:flex; flex-direction:column;}
+  .roster-row{display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid var(--card-line); background:var(--ivory);}
+  .roster-row:last-child{border-bottom:none;}
+  .roster-name{font-size:14.5px; font-weight:500; color:var(--ink);}
+  .roster-meta{font-size:12.5px; color:var(--ink-faint); margin-top:2px;}
+  .roster-badge{font-size:11.5px; font-weight:600; padding:4px 10px; border-radius:20px; white-space:nowrap;}
+  .roster-badge.ontrack{background:var(--sage-pale); color:var(--sage-deep);}
+  .roster-badge.slipping{background:#E6D3C7; color:var(--terra-deep);}
+  .roster-badge.silent{background:var(--terra); color:#F4E7DD;}
+
+  /* consultative process */
+  .process-section{padding:72px 0; border-bottom:1px solid var(--card-line);}
+  .process-section .label{font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--terra-deep); font-weight:600; margin-bottom:14px;}
+  .process-section h2{font-size:28px; max-width:620px; margin-bottom:12px;}
+  .process-section p.lead{font-size:15px; color:var(--ink-soft); max-width:560px; margin-bottom:40px;}
+  .process-line{position:relative; display:grid; grid-template-columns:repeat(4,1fr); gap:20px;}
+  @media (max-width:800px){ .process-line{grid-template-columns:1fr;} }
+  .process-line::before{content:''; position:absolute; top:9px; left:0; right:0; height:1px; background:var(--card-line);}
+  @media (max-width:800px){ .process-line::before{display:none;} }
+  .process-step{position:relative; padding-top:28px;}
+  .process-step::before{content:''; position:absolute; top:4px; left:0; width:11px; height:11px; border-radius:50%; background:var(--sage-deep); border:2px solid var(--ivory);}
+  .process-step .tag{font-size:11.5px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:var(--sage-deep); margin-bottom:8px;}
+  .process-step h3{font-size:17px; margin-bottom:8px;}
+  .process-step p{font-size:13.5px; color:var(--ink-soft);}
+
+  /* not crm crm */
+  .statement{padding:72px 0; border-bottom:1px solid var(--card-line);}
+  .statement .label{font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--terra-deep); font-weight:600; margin-bottom:16px;}
+  .statement h2{font-size:30px; max-width:620px; margin-bottom:20px;}
+  .statement p.lead{font-size:16px; color:var(--ink-soft); max-width:560px;}
+
+  .compare{display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--card-line); border:1px solid var(--card-line); margin-top:36px; border-radius:4px; overflow:hidden;}
+  @media (max-width:640px){ .compare{grid-template-columns:1fr;} }
+  .compare > div{background:var(--ivory); padding:26px 28px;}
+  .compare h3{font-size:14px; font-family:'Inter',sans-serif; font-weight:600; letter-spacing:0.02em; margin-bottom:12px; color:var(--ink-faint); text-transform:uppercase;}
+  .compare ul{margin:0; padding:0; list-style:none;}
+  .compare li{font-size:15px; padding:7px 0; color:var(--ink-soft);}
+  .compare .fen-col h3{color:var(--sage-deep);}
+  .compare .fen-col li{color:var(--ink);}
+
+  /* two nodes */
+  .nodes{padding:72px 0; border-bottom:1px solid var(--card-line);}
+  .nodes > .wrap > .label{font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--sage-deep); font-weight:600; margin-bottom:14px;}
+  .nodes h2{font-size:28px; max-width:600px; margin-bottom:44px;}
+
+  .node-grid{display:grid; grid-template-columns:1fr 1fr; gap:24px;}
+  @media (max-width:720px){ .node-grid{grid-template-columns:1fr;} }
+  .node-card{border:1px solid var(--card-line); border-radius:4px; padding:28px; background:var(--card);}
+  .node-card .tag{font-size:12px; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; margin-bottom:14px;}
+  .node-card.client .tag{color:var(--terra-deep);}
+  .node-card.referrer .tag{color:var(--sage-deep);}
+  .node-card h3{font-family:'Fraunces', serif; font-size:22px; font-weight:500; margin-bottom:10px; color:var(--ink);}
+  .node-card p{font-size:14.5px; color:var(--ink-soft); margin-bottom:20px;}
+  .node-card svg{display:block; width:100%; height:auto;}
+
+  /* roi math */
+  .roi-section{padding:80px 0; border-bottom:1px solid var(--card-line);}
+  .roi-section .label{font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--sage-deep); font-weight:600; margin-bottom:14px;}
+  .roi-section h2{font-size:28px; max-width:600px; margin-bottom:12px;}
+  .roi-section p.lead{font-size:15px; color:var(--ink-soft); max-width:560px; margin-bottom:40px;}
+  .roi-box{border:1px solid var(--card-line); border-radius:4px; background:var(--card); padding:32px 32px 28px;}
+  .roi-assume-grid{display:grid; grid-template-columns:1fr 1fr; gap:28px; margin-bottom:30px; padding-bottom:26px; border-bottom:1px solid var(--card-line);}
+  @media (max-width:640px){ .roi-assume-grid{grid-template-columns:1fr;} }
+  .roi-assume label{display:block; font-size:13px; color:var(--ink-soft); margin-bottom:10px;}
+  .roi-assume label strong{color:var(--ink); font-weight:600;}
+  .roi-figure{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; margin-bottom:6px;}
+  .roi-figure .num{font-family:'Fraunces', serif; font-size:44px; color:var(--sage-deep);}
+  .roi-figure .of{font-size:15px; color:var(--ink-soft);}
+  .roi-bar-track{height:10px; border-radius:20px; background:var(--sage-pale); overflow:hidden; margin:22px 0 18px;}
+  .roi-bar-fill{height:100%; background:var(--terra); border-radius:20px; transition:width 0.4s ease; width:3%;}
+  .roi-slider{width:100%; -webkit-appearance:none; appearance:none; height:4px; border-radius:4px; background:var(--card-line); outline:none;}
+  .roi-slider::-webkit-slider-thumb{-webkit-appearance:none; width:18px; height:18px; border-radius:50%; background:var(--sage-deep); border:3px solid var(--ivory); box-shadow:0 0 0 1px var(--sage-deep); cursor:pointer;}
+  .roi-slider::-moz-range-thumb{width:18px; height:18px; border-radius:50%; background:var(--sage-deep); border:3px solid var(--ivory); cursor:pointer;}
+  .roi-stops{display:flex; justify-content:space-between; font-size:12px; color:var(--ink-faint); margin-top:8px;}
+  .roi-assumption{font-size:12.5px; color:var(--ink-faint); margin-top:20px; font-style:italic; max-width:520px;}
+
+  /* philosophy */
+  .philosophy{background:var(--sage-deep); color:var(--ivory); padding:96px 0; text-align:center;}
+  .philosophy .wrap{max-width:640px;}
+  .philosophy .label{font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:#AEBEA4; font-weight:600; margin-bottom:24px;}
+  .philosophy h2{font-size:36px; line-height:1.3; color:var(--ivory); font-weight:500;}
+  @media (max-width:640px){ .philosophy h2{font-size:26px;} }
+  .philosophy p.sub{margin-top:22px; font-size:15px; color:#C3D0BB; font-family:'Inter',sans-serif;}
+
+  /* references */
+  .references{padding:56px 0; border-top:1px solid var(--card-line);}
+  .references .label{font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); font-weight:600; margin-bottom:20px;}
+  .ref-group{margin-bottom:22px;}
+  .ref-group h3{font-family:'Inter',sans-serif; font-size:12px; font-weight:600; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.03em; margin-bottom:10px;}
+  .ref-list{margin:0; padding:0; list-style:none; max-width:640px;}
+  .ref-list li{font-size:13px; color:var(--ink-soft); line-height:1.65; padding-left:1.75em; text-indent:-1.75em; margin-bottom:11px;}
+  .ref-list a{color:var(--sage-deep); text-decoration:underline; text-underline-offset:2px; word-break:break-word;}
+
+  /* footer */
+  footer{padding:48px 0; }
+  footer .wrap{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;}
+  footer .wordmark .mark{font-size:18px;}
+  footer .note{font-size:13px; color:var(--ink-faint);}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="wordmark">
+      <span class="mark">fen</span>
+      <span class="full">foundation for enduring networks</span>
+    </div>
+    <span class="nav-note">relationship intelligence, not sales pipeline</span>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">For mental health specialists who also run their own practice</p>
+    <h1>The two relationships your EHR was never built to notice.</h1>
+    <p class="sub">Fen tracks the things that disappear quietly — a client who stops showing up without a word, and a referring doctor whose goodwill runs out from neglect. This is not CRM CRM. It's built around continuity and care, run with the rigor of a real business tool.</p>
+
+    <div class="pulse-wrap">
+      <svg viewBox="0 0 760 220" role="img" aria-labelledby="pulseTitle pulseDesc" preserveAspectRatio="xMidYMid meet">
+        <title id="pulseTitle">Two relationship patterns fen tracks</title>
+        <desc id="pulseDesc">A client engagement line trending downward and fading, and a referral relationship line building steadily upward, meeting at a small central mark.</desc>
+
+        <!-- client line: starts high, drifts down, fades -->
+        <path d="M20,60 C120,64 180,90 260,120 C330,144 380,170 430,190" fill="none" stroke="#95462A" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="0" opacity="0.9"/>
+        <path d="M430,190 C455,198 470,203 486,207" fill="none" stroke="#95462A" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4 7" opacity="0.45"/>
+        <circle cx="486" cy="207" r="3.5" fill="#95462A" opacity="0.45"/>
+
+        <!-- referrer line: starts low, builds steadily with small pulse dots -->
+        <path d="M20,168 C110,160 170,140 240,118 C320,93 390,78 470,58 C540,41 590,34 640,26" fill="none" stroke="#28392E" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="240" cy="118" r="3.5" fill="#28392E"/>
+        <circle cx="390" cy="78" r="3.5" fill="#28392E"/>
+        <circle cx="540" cy="41" r="3.5" fill="#28392E"/>
+        <circle cx="640" cy="26" r="4.5" fill="#28392E"/>
+
+        <!-- fen node mark where attention concentrates -->
+        <g transform="translate(700,90)">
+          <rect x="-2" y="-14" width="4" height="28" rx="2" fill="#4C6A57"/>
+          <rect x="8" y="-22" width="4" height="44" rx="2" fill="#95462A"/>
+          <rect x="18" y="-8" width="4" height="20" rx="2" fill="#4C6A57"/>
+        </g>
+      </svg>
+      <div class="pulse-legend">
+        <span><span class="dot" style="background:#95462A"></span> client engagement — drifting</span>
+        <span><span class="dot" style="background:#28392E"></span> referral relationship — building</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="cost-section" id="cost">
+  <div class="cost-inner">
+    <div class="cost-visual">
+      <p class="cost-eyebrow">The quiet cost</p>
+      <div class="dot-grid" id="costDots" aria-hidden="true"></div>
+      <p class="cost-stat" id="costStat">8 of 30</p>
+      <p class="cost-caption" id="costCaption">clients statistically drifting away right now, in an average caseload</p>
+      <p class="cost-unit" id="costUnit">each dot = 1 client in a caseload of 30</p>
+    </div>
+
+    <div class="cost-steps">
+      <div class="cost-step" data-step="1">
+        <h3>Right now, in an average caseload</h3>
+        <p>Across therapy practices, early dropout has been measured as high as 27.8% of clients — leaving within the first few sessions, often without a word.</p>
+        <p class="src">Oh et al. (2026); early dropout defined as fewer than three sessions attended.</p>
+      </div>
+      <div class="cost-step" data-step="2">
+        <h3>And it rarely announces itself</h3>
+        <p>When a client stops coming, they usually don't call to cancel — they just stop showing up. Missed-appointment rates in outpatient therapy typically run between 20% and 30%.</p>
+        <p class="src">Curogram (2026), based on aggregated scheduling data — industry-reported, not peer-reviewed.</p>
+      </div>
+      <div class="cost-step" data-step="3">
+        <h3>Each one quietly costs something real</h3>
+        <p>Private-pay therapy sessions average around $159. When a client fades instead of formally ending treatment, that revenue doesn't get replaced — it just stops appearing inside an already full calendar.</p>
+        <p class="src">Session rate from Blueprint (2025); the $1,272 total is an illustrative estimate, not a guarantee.</p>
+      </div>
+      <div class="cost-step" data-step="4">
+        <h3>The other kind of drift</h3>
+        <p>One private-practice therapist put it plainly: networking lunches are like lottery tickets, about one in ten pays off. Referral relationships take real effort to build — and almost none to lose.</p>
+        <p class="src">Rousmaniere (n.d.).</p>
+      </div>
+      <div class="cost-step" data-step="5">
+        <h3>None of this shows up on a calendar</h3>
+        <p>It only shows up later — as a caseload that's a little smaller than it used to be, and a referral network gone quiet for reasons nobody can quite explain. Fen is built to notice first.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="roster-section" id="roster">
+  <div class="wrap">
+    <p class="label">The client list, reordered</p>
+    <h2>Sorted by relationship, not the alphabet.</h2>
+    <p class="lead">Every EHR sorts clients A to Z. Fen sorts by what actually needs your attention, so the client who's gone quiet surfaces before the one whose name simply starts with A.</p>
+
+    <div class="roster-card">
+      <div class="roster-head">
+        <span class="title">Client list</span>
+        <div class="sort-toggle" role="group" aria-label="Sort client list">
+          <button type="button" id="sortRelationship" class="active">By relationship</button>
+          <button type="button" id="sortAlpha">A–Z</button>
+        </div>
+      </div>
+      <div class="roster-rows" id="rosterRows"></div>
+    </div>
+  </div>
+</section>
+
+<section class="process-section" id="process">
+  <div class="wrap">
+    <p class="label">How fen gets built for one practice</p>
+    <h2>Not a feature backlog. A handful of real sessions, spent understanding one Tuesday at a time.</h2>
+    <p class="lead">Before any screen gets designed, the work is understanding what a real day actually looks like — where the gaps are, and where something quietly slips through.</p>
+
+    <div class="process-line">
+      <div class="process-step">
+        <p class="tag">Session one</p>
+        <h3>Shadow a real day</h3>
+        <p>Sit through the actual gaps between sessions, the inbox pile, the evening notes catch-up — not a hypothetical Tuesday.</p>
+      </div>
+      <div class="process-step">
+        <p class="tag">Session two</p>
+        <h3>Map what's invisible</h3>
+        <p>Find where relationships quietly slip — which clients, which referrers, which moments get missed.</p>
+      </div>
+      <div class="process-step">
+        <p class="tag">Session three</p>
+        <h3>Prototype together</h3>
+        <p>Build the exact screen that would have caught last month's silent drop-off, tested against real history.</p>
+      </div>
+      <div class="process-step">
+        <p class="tag">Session four</p>
+        <h3>Refine, then hand off</h3>
+        <p>Adjust based on what actually gets used in week one, not what looked good in the pitch.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="statement">
+  <div class="wrap">
+    <p class="label">Not CRM CRM</p>
+    <h2>A pipeline was built for deals. This was built for people who come back — or should have.</h2>
+    <p class="lead">Traditional CRMs assume a relationship ends at a sale. Practice-management EHRs assume a relationship is just a series of appointments. Neither one notices the space in between, where trust is either kept warm or quietly lost.</p>
+
+    <div class="compare">
+      <div>
+        <h3>Sales CRM</h3>
+        <ul>
+          <li>Deals, stages, quotas</li>
+          <li>Relationship ends at close</li>
+          <li>Built for acquisition</li>
+        </ul>
+      </div>
+      <div class="fen-col">
+        <h3>Fen</h3>
+        <ul>
+          <li>Cadence, continuity, follow-through</li>
+          <li>Relationship is the whole point</li>
+          <li>Built for retention and trust</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="nodes">
+  <div class="wrap">
+    <p class="label">Two nodes, one system</p>
+    <h2>Every relationship in the practice reduces to one of two shapes.</h2>
+
+    <div class="node-grid">
+      <div class="node-card client">
+        <p class="tag">Node one — the client</p>
+        <h3>Drifts away slowly</h3>
+        <svg viewBox="0 0 300 90" role="img" aria-label="A line showing steady decline">
+          <path d="M10,20 C70,26 120,45 170,62 C210,75 240,80 280,82" fill="none" stroke="#95462A" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="10" cy="20" r="3.5" fill="#95462A"/>
+          <circle cx="280" cy="82" r="3.5" fill="#95462A" opacity="0.5"/>
+        </svg>
+        <p>Rarely a cancellation, never an announcement — the gap between sessions just quietly widens until they're gone. Fen watches cadence, not just the calendar, and flags the drift while there's still time to reach out (Bugatti et al., 2024).</p>
+      </div>
+
+      <div class="node-card referrer">
+        <p class="tag">Node two — the referring doctor</p>
+        <h3>Builds through natural contact</h3>
+        <svg viewBox="0 0 300 90" role="img" aria-label="A line showing steady growth with pulse points">
+          <path d="M10,75 C70,68 120,50 170,35 C210,23 240,16 280,10" fill="none" stroke="#28392E" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="90" cy="60" r="3" fill="#28392E"/>
+          <circle cx="190" cy="28" r="3" fill="#28392E"/>
+          <circle cx="280" cy="10" r="4" fill="#28392E"/>
+        </svg>
+        <p>Referral relationships don't grow on their own — they grow on being acknowledged. Fen tracks who sent what, when they last heard back, and nudges the loop closed before goodwill quietly runs dry.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="roi-section" id="roi">
+  <div class="wrap">
+    <p class="label">What one client is worth</p>
+    <h2>Win back clients who'd otherwise have drifted, and the math adds up fast.</h2>
+    <p class="lead">The numbers below aren't ours to assume — they're yours to set. Adjust your own session rate and typical episode length, then see what a year of not losing clients is actually worth.</p>
+
+    <div class="roi-box">
+      <div class="roi-assume-grid">
+        <div class="roi-assume">
+          <label for="rateSlider">Average session rate — <strong id="rateVal">$159</strong></label>
+          <input type="range" class="roi-slider" id="rateSlider" min="80" max="260" step="5" value="159" aria-label="Average session rate in dollars">
+        </div>
+        <div class="roi-assume">
+          <label for="sessionsSlider">Average sessions per retained client — <strong id="sessionsVal">20</strong></label>
+          <input type="range" class="roi-slider" id="sessionsSlider" min="6" max="40" step="1" value="20" aria-label="Average remaining sessions per retained client">
+        </div>
+      </div>
+
+      <div class="roi-figure">
+        <span class="num" id="roiTotal">$3,180</span>
+        <span class="of">recovered in a year from <strong id="roiCount">1</strong> retained client</span>
+      </div>
+      <div class="roi-bar-track"><div class="roi-bar-fill" id="roiBar"></div></div>
+      <input type="range" class="roi-slider" id="roiSlider" min="0" max="4" step="1" value="0" aria-label="Number of clients retained">
+      <div class="roi-stops"><span>1</span><span>3</span><span>5</span><span>10</span><span>30</span></div>
+      <p class="roi-assumption">Illustrative — based on the rate and episode length set above, not a guarantee.</p>
+    </div>
+  </div>
+</section>
+
+<section class="philosophy">
+  <div class="wrap">
+    <p class="label">The core belief</p>
+    <h2>Relationship, before revenue. Every decision in this product answers to that first.</h2>
+    <p class="sub">Revenue follows relationships that are actually maintained — not the other way around.</p>
+  </div>
+</section>
+
+<section class="references" id="references">
+  <div class="wrap">
+    <p class="label">References</p>
+
+    <div class="ref-group">
+      <h3>Peer-reviewed research</h3>
+      <ul class="ref-list">
+        <li>Bugatti, M., Owen, J., Richardson, Z., Rasmussen, W., &amp; Newton, D. A. (2024). Changes in therapists' client dropout rates over time: Findings from a practice-research group. <em>Journal of Counseling &amp; Development, 102</em>, 361–369. <a href="https://doi.org/10.1002/jcad.12521" target="_blank" rel="noopener">https://doi.org/10.1002/jcad.12521</a></li>
+        <li>Oh, S., Bugatti, M., Hines, M., Sandage, S. J., &amp; Owen, J. (2026). Clinician burnout and flourishing: Predicting client dropout in a practice-research network. <em>Clinical Psychology &amp; Psychotherapy, 33</em>(2), e70258. <a href="https://doi.org/10.1002/cpp.70258" target="_blank" rel="noopener">https://doi.org/10.1002/cpp.70258</a></li>
+      </ul>
+    </div>
+
+    <div class="ref-group">
+      <h3>Industry sources</h3>
+      <ul class="ref-list">
+        <li>Blueprint. (2025, October 18). <em>The therapist private practice cost crunch of 2025.</em> <a href="https://www.blueprint.ai/blog/private-practice-costs" target="_blank" rel="noopener">https://www.blueprint.ai/blog/private-practice-costs</a></li>
+        <li>Curogram. (2026, April 25). <em>Why no-show rates are higher in mental health, and how to fix them.</em> <a href="https://curogram.com/blog/mental-health/mental-health-appointment-no-shows" target="_blank" rel="noopener">https://curogram.com/blog/mental-health/mental-health-appointment-no-shows</a></li>
+        <li>Rousmaniere, T. (n.d.). <em>Preventing psychotherapy dropouts with client feedback.</em> Psychotherapy.net. <a href="https://www.psychotherapy.net/article/psychotherapy-dropouts" target="_blank" rel="noopener">https://www.psychotherapy.net/article/psychotherapy-dropouts</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="wordmark">
+      <span class="mark">fen</span>
+    </div>
+    <span class="note">A working name, built for one practice first. Foundation for Enduring Networks.</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var dotsContainer = document.getElementById('costDots');
+  var TOTAL_DOTS = 30;
+  var dots = [];
+  for (var i = 0; i < TOTAL_DOTS; i++){
+    var d = document.createElement('div');
+    d.className = 'dot';
+    d.style.transitionDelay = (i * 22) + 'ms';
+    d.style.animationDelay = (i * 0.05) + 's';
+    dotsContainer.appendChild(d);
+    dots.push(d);
+  }
+
+  var statEl = document.getElementById('costStat');
+  var captionEl = document.getElementById('costCaption');
+  var unitEl = document.getElementById('costUnit');
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var ALL = Array.from({length: 30}, function(_, i){ return i; });
+
+  var stepData = {
+    1: { driftIdx:[0,1,2,3,4,5,6,7], flaggedIdx:[], stat:'8 of 30', caption:'clients statistically drifting away right now, in an average caseload', unit:'each dot = 1 client in a caseload of 30' },
+    2: { driftIdx:[0,1,2,3,4,5,6,7], flaggedIdx:[], stat:'~25%', caption:'of scheduled sessions go unattended, industry-wide', unit:'same 8 clients \u2014 8 of 30 is roughly 25%' },
+    3: { driftIdx:[0,1,2,3,4,5,6,7], flaggedIdx:[], stat:'$1,272', caption:'illustrative \u2014 8 drifting clients \u00d7 one missed monthly session at $159', unit:'8 clients \u00d7 $159 = $1,272 a month, quietly' },
+    4: { driftIdx:ALL, flaggedIdx:[29], stat:'60 days', caption:'of silence is often enough to end a referral relationship', unit:'each dot = 2 days \u2014 30 dots span the 60-day window' },
+    5: { driftIdx:[], flaggedIdx:[0,1,2,29], stat:'watching', caption:'this is what fen flags, quietly, before it becomes a loss', unit:'flagged dots are what fen would have caught first' }
+  };
+
+  function render(step){
+    var data = stepData[step];
+    if (!data) return;
+    dots.forEach(function(dot, idx){
+      dot.classList.toggle('drift', data.driftIdx.indexOf(idx) !== -1);
+      dot.classList.toggle('flagged', data.flaggedIdx.indexOf(idx) !== -1);
+    });
+    if (reduceMotion){
+      statEl.textContent = data.stat;
+      captionEl.textContent = data.caption;
+      unitEl.textContent = data.unit;
+    } else {
+      statEl.classList.add('pop');
+      setTimeout(function(){
+        statEl.textContent = data.stat;
+        captionEl.textContent = data.caption;
+        unitEl.textContent = data.unit;
+        statEl.classList.remove('pop');
+      }, 180);
+    }
+  }
+
+  render(1);
+
+  var steps = document.querySelectorAll('.cost-step');
+  var current = 1;
+
+  function getActiveStep(){
+    var center = window.innerHeight / 2;
+    var closest = null, closestDist = Infinity;
+    steps.forEach(function(s){
+      var rect = s.getBoundingClientRect();
+      var stepCenter = rect.top + rect.height / 2;
+      var dist = Math.abs(stepCenter - center);
+      if (dist < closestDist){ closestDist = dist; closest = s; }
+    });
+    return closest;
+  }
+
+  var ticking = false;
+  function onScroll(){
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(function(){
+      var active = getActiveStep();
+      if (active){
+        steps.forEach(function(s){ s.classList.toggle('active', s === active); });
+        var step = parseInt(active.getAttribute('data-step'), 10);
+        if (step !== current){
+          current = step;
+          render(step);
+        }
+      }
+      ticking = false;
+    });
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  onScroll();
+})();
+</script>
+
+<script>
+(function(){
+  var rosterData = [
+    { name:'J. Whitfield', days:34, status:'silent', label:'Silent 34 days' },
+    { name:'S. Okafor', days:19, status:'slipping', label:'Slipping — 19 days' },
+    { name:'D. Marsh', days:21, status:'slipping', label:'Slipping — 21 days' },
+    { name:'M. Alvarez', days:3, status:'ontrack', label:'On track' },
+    { name:'R. Chen', days:9, status:'ontrack', label:'On track' },
+    { name:'T. Boyd', days:6, status:'ontrack', label:'On track' }
+  ];
+  var riskRank = { silent:0, slipping:1, ontrack:2 };
+
+  var rowsEl = document.getElementById('rosterRows');
+  var btnRel = document.getElementById('sortRelationship');
+  var btnAlpha = document.getElementById('sortAlpha');
+  rowsEl.style.transition = 'opacity 0.18s ease';
+
+  function renderRoster(mode){
+    var data = rosterData.slice();
+    if (mode === 'alpha'){
+      data.sort(function(a,b){ return a.name.localeCompare(b.name); });
+    } else {
+      data.sort(function(a,b){
+        if (riskRank[a.status] !== riskRank[b.status]) return riskRank[a.status] - riskRank[b.status];
+        return b.days - a.days;
+      });
+    }
+    rowsEl.style.opacity = '0';
+    setTimeout(function(){
+      rowsEl.innerHTML = '';
+      data.forEach(function(c){
+        var row = document.createElement('div');
+        row.className = 'roster-row';
+        row.innerHTML =
+          '<div><div class="roster-name">' + c.name + '</div>' +
+          '<div class="roster-meta">Last session ' + c.days + ' days ago</div></div>' +
+          '<span class="roster-badge ' + c.status + '">' + c.label + '</span>';
+        rowsEl.appendChild(row);
+      });
+      rowsEl.style.opacity = '1';
+    }, 180);
+  }
+
+  btnRel.addEventListener('click', function(){
+    btnRel.classList.add('active');
+    btnAlpha.classList.remove('active');
+    renderRoster('relationship');
+  });
+  btnAlpha.addEventListener('click', function(){
+    btnAlpha.classList.add('active');
+    btnRel.classList.remove('active');
+    renderRoster('alpha');
+  });
+
+  renderRoster('relationship');
+})();
+</script>
+
+<script>
+(function(){
+  var stops = [1, 3, 5, 10, 30];
+
+  var rateSlider = document.getElementById('rateSlider');
+  var sessionsSlider = document.getElementById('sessionsSlider');
+  var clientSlider = document.getElementById('roiSlider');
+  var rateVal = document.getElementById('rateVal');
+  var sessionsVal = document.getElementById('sessionsVal');
+  var totalEl = document.getElementById('roiTotal');
+  var countEl = document.getElementById('roiCount');
+  var barEl = document.getElementById('roiBar');
+
+  function fmt(n){
+    return '$' + Math.round(n).toLocaleString('en-US');
+  }
+
+  function renderRoi(){
+    var rate = parseInt(rateSlider.value, 10);
+    var sessions = parseInt(sessionsSlider.value, 10);
+    var clients = stops[parseInt(clientSlider.value, 10)];
+    var perClient = rate * sessions;
+    var total = perClient * clients;
+    var maxVal = perClient * stops[stops.length - 1];
+
+    rateVal.textContent = '$' + rate;
+    sessionsVal.textContent = sessions;
+    totalEl.textContent = fmt(total);
+    countEl.textContent = clients;
+    var pct = maxVal > 0 ? Math.max(3, Math.round((total / maxVal) * 100)) : 3;
+    barEl.style.width = pct + '%';
+  }
+
+  [rateSlider, sessionsSlider, clientSlider].forEach(function(el){
+    el.addEventListener('input', renderRoi);
+  });
+
+  renderRoi();
+})();
+</script>
+</body>
+</html>
