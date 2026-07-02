@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>fen — brand kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ivory:#EDF0E9;
+    --card:#E1E7DC;
+    --card-line:#C9D2C2;
+    --ink:#1D231E;
+    --ink-soft:#4B5346;
+    --ink-faint:#7C8578;
+    --sage:#4C6A57;
+    --sage-deep:#28392E;
+    --sage-pale:#D2DDCC;
+    --terra:#95462A;
+    --terra-deep:#5A2717;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--ivory); color:var(--ink); font-family:'Inter', sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{font-family:'Fraunces', serif; margin:0; font-weight:500; letter-spacing:-0.01em;}
+  p{margin:0;}
+  a{color:inherit;}
+  :focus-visible{outline:2px solid var(--sage-deep); outline-offset:3px;}
+  code{font-family:'Inter',sans-serif; font-size:12.5px; background:var(--card); padding:2px 6px; border-radius:4px; color:var(--ink-soft);}
+
+  .wrap{max-width:1080px; margin:0 auto; padding:0 32px;}
+  @media (max-width:640px){ .wrap{padding:0 20px;} }
+
+  nav{padding:26px 0; border-bottom:1px solid var(--card-line);}
+  nav .wrap{display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+  .wordmark{display:flex; align-items:baseline; gap:10px;}
+  .wordmark .mark{font-size:22px; font-weight:600;}
+  .wordmark .full{font-size:11px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.09em; font-weight:500;}
+  .back-link{font-size:12.5px; color:var(--sage-deep); text-decoration:underline; text-underline-offset:2px;}
+
+  .kit-hero{padding:64px 0 48px; border-bottom:1px solid var(--card-line);}
+  .kit-hero .label{font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--sage-deep); font-weight:600; margin-bottom:18px;}
+  .kit-hero h1{font-size:42px; max-width:680px; margin-bottom:16px;}
+  @media (max-width:640px){ .kit-hero h1{font-size:30px;} }
+  .kit-hero p.sub{font-size:16px; color:var(--ink-soft); max-width:560px;}
+
+  section.block{padding:64px 0; border-bottom:1px solid var(--card-line);}
+  .block .label{font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--terra-deep); font-weight:600; margin-bottom:14px;}
+  .block h2{font-size:27px; max-width:620px; margin-bottom:14px;}
+  .block p.lead{font-size:15px; color:var(--ink-soft); max-width:600px; margin-bottom:32px;}
+
+  .reason-list{margin:0; padding:0; list-style:none; max-width:640px; display:flex; flex-direction:column; gap:14px;}
+  .reason-list li{font-size:14.5px; color:var(--ink-soft); padding-left:20px; position:relative;}
+  .reason-list li::before{content:''; position:absolute; left:0; top:8px; width:6px; height:6px; border-radius:50%; background:var(--sage);}
+  .reason-list li strong{color:var(--ink); font-weight:600;}
+
+  .conflict-note{background:var(--card); border:1px solid var(--card-line); border-radius:4px; padding:18px 20px; margin-top:24px; font-size:13.5px; color:var(--ink-soft); max-width:640px;}
+  .conflict-note strong{color:var(--terra-deep);}
+
+  /* palette swatches */
+  .swatch-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:14px;}
+  .swatch{border:1px solid var(--card-line); border-radius:6px; overflow:hidden; background:var(--ivory);}
+  .swatch-fill{height:64px;}
+  .swatch-body{padding:12px 14px;}
+  .swatch-name{font-size:13.5px; font-weight:600; margin-bottom:2px;}
+  .swatch-hex{font-size:12px; color:var(--ink-faint); font-family:monospace; margin-bottom:8px;}
+  .swatch-role{font-size:12.5px; color:var(--ink-soft); line-height:1.5;}
+
+  /* why not the default */
+  .avoid-box{border:1px solid var(--card-line); border-radius:4px; padding:24px 26px; background:var(--card); max-width:680px;}
+  .avoid-box .tag{font-size:11.5px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:var(--terra-deep); margin-bottom:10px;}
+  .avoid-compare{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:18px;}
+  @media (max-width:560px){ .avoid-compare{grid-template-columns:1fr;} }
+  .avoid-compare > div{font-size:13px; color:var(--ink-soft);}
+  .avoid-compare h4{font-size:12px; font-family:'Inter',sans-serif; font-weight:600; text-transform:uppercase; letter-spacing:0.03em; color:var(--ink-faint); margin-bottom:8px;}
+  .swatch-mini{display:inline-block; width:14px; height:14px; border-radius:3px; vertical-align:-2px; margin-right:6px; border:1px solid var(--card-line);}
+
+  /* type specimen */
+  .type-row{display:flex; align-items:baseline; gap:24px; padding:20px 0; border-bottom:1px solid var(--card-line);}
+  .type-row:last-child{border-bottom:none;}
+  .type-row .glyph{font-family:'Fraunces', serif; font-size:52px; width:90px; flex-shrink:0;}
+  .type-row.sans .glyph{font-family:'Inter', sans-serif; font-weight:500;}
+  .type-row .meta{font-size:13px; color:var(--ink-soft); line-height:1.6;}
+  .type-row .meta strong{color:var(--ink); font-family:'Inter',sans-serif; font-weight:600;}
+
+  .scale-table{width:100%; border-collapse:collapse; margin-top:8px; font-size:13.5px;}
+  .scale-table td{padding:9px 0; border-bottom:1px solid var(--card-line); color:var(--ink-soft);}
+  .scale-table td:first-child{color:var(--ink); font-weight:500; width:160px;}
+
+  /* mark */
+  .mark-grid{display:grid; grid-template-columns:1fr 1fr; gap:24px;}
+  @media (max-width:640px){ .mark-grid{grid-template-columns:1fr;} }
+  .mark-card{border:1px solid var(--card-line); border-radius:4px; padding:28px; background:var(--card); display:flex; flex-direction:column; align-items:flex-start; gap:16px;}
+  .mark-card.dark{background:var(--sage-deep);}
+  .mark-lockup{display:flex; align-items:baseline; gap:10px;}
+  .mark-lockup span.mk{font-family:'Fraunces', serif; font-weight:600; font-size:30px;}
+  .mark-card p{font-size:13px; color:var(--ink-soft);}
+  .mark-card.dark p{color:#B9C6B4;}
+
+  /* voice */
+  .voice-grid{display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--card-line); border:1px solid var(--card-line); border-radius:4px; overflow:hidden;}
+  @media (max-width:640px){ .voice-grid{grid-template-columns:1fr;} }
+  .voice-grid > div{background:var(--ivory); padding:16px 20px;}
+  .voice-grid .tag{font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:6px;}
+  .voice-grid .no .tag{color:var(--terra-deep);}
+  .voice-grid .yes .tag{color:var(--sage-deep);}
+  .voice-grid p.ex{font-size:14px; color:var(--ink); margin-bottom:0;}
+
+  /* usage components */
+  .comp-row{display:flex; align-items:center; gap:16px; flex-wrap:wrap; padding:16px 0; border-bottom:1px solid var(--card-line);}
+  .comp-row:last-child{border-bottom:none;}
+  .comp-label{font-size:12.5px; color:var(--ink-faint); width:140px; flex-shrink:0;}
+  .badge{font-size:11.5px; font-weight:600; padding:4px 10px; border-radius:20px;}
+  .badge.ontrack{background:var(--sage-pale); color:var(--sage-deep);}
+  .badge.slipping{background:#E6D3C7; color:var(--terra-deep);}
+  .badge.silent{background:var(--terra); color:#F4E7DD;}
+  .btn{font-family:'Inter',sans-serif; font-size:12.5px; font-weight:500; padding:8px 16px; border:1px solid var(--card-line); border-radius:4px; background:var(--ivory); color:var(--ink-soft); cursor:default;}
+  .btn.active{background:var(--sage-deep); color:var(--ivory); border-color:var(--sage-deep);}
+  .dot-demo{width:13px; height:13px; border-radius:50%; display:inline-block; margin-right:6px;}
+
+  footer{padding:44px 0;}
+  footer .wrap{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;}
+  footer .note{font-size:13px; color:var(--ink-faint);}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="wordmark"><span class="mark">fen</span><span class="full">brand kit</span></div>
+    <a class="back-link" href="index.html">back to the site</a>
+  </div>
+</nav>
+
+<header class="kit-hero">
+  <div class="wrap">
+    <p class="label">Internal reference — v1</p>
+    <h1>Every choice here answers to a reason, not a preference.</h1>
+    <p class="sub">This is the working brand kit for fen — the name, the palette, the type, and the voice, along with why each one was chosen and what it was deliberately built to avoid.</p>
+  </div>
+</header>
+
+<section class="block">
+  <div class="wrap">
+    <p class="label">The name</p>
+    <h2>fen — Foundation for Enduring Networks</h2>
+    <p class="lead">Short, abstract, and built for the professional-tool category — closer to Attio, Folk, and Dex than to a wellness app.</p>
+
+    <ul class="reason-list">
+      <li><strong>Category fit.</strong> Comparable products are relationship-intelligence CRMs, not consumer wellness apps — the name needed to read as a serious business tool, not a self-care product.</li>
+      <li><strong>Built-in double meaning.</strong> A fen is a wetland of reeds — the logo mark reads as reeds and as a sparkline at once, which is literally what the cadence-tracking feature produces.</li>
+      <li><strong>Checked, not assumed.</strong> Aro, Faro, and Kip were all considered and ruled out after a direct-conflict check — one of them (Kipu) is an existing CRM built for behavioral health, the exact adjacent space fen occupies.</li>
+    </ul>
+
+    <div class="conflict-note"><strong>Note:</strong> the conflict check above was a lightweight web search, not formal trademark or domain clearance. That step still needs to happen before anything goes public.</div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <p class="label">Color</p>
+    <h2>Mist, moss, and rust — not cream and clay.</h2>
+    <p class="lead">Light and calm was always the goal. But the first pass landed on warm cream plus a terracotta accent, which is close to the most common AI-generated design fingerprint right now — and close to Claude's own interaction color. The palette was rebuilt around a cooler, greener base to read as its own thing.</p>
+
+    <div class="swatch-grid">
+      <div class="swatch"><div class="swatch-fill" style="background:#EDF0E9"></div><div class="swatch-body"><p class="swatch-name">Mist</p><p class="swatch-hex">#EDF0E9</p><p class="swatch-role">Base surface. Cool and pale rather than a yellow-leaning cream.</p></div></div>
+      <div class="swatch"><div class="swatch-fill" style="background:#E1E7DC"></div><div class="swatch-body"><p class="swatch-name">Card</p><p class="swatch-hex">#E1E7DC</p><p class="swatch-role">Section and card surfaces, one step deeper than mist.</p></div></div>
+      <div class="swatch"><div class="swatch-fill" style="background:#C9D2C2"></div><div class="swatch-body"><p class="swatch-name">Line</p><p class="swatch-hex">#C9D2C2</p><p class="swatch-role">Hairline borders and dividers throughout.</p></div></div>
+      <div class="swatch"><div class="swatch-fill" style="background:#1D231E"></div><div class="swatch-body"><p class="swatch-name">Ink</p><p class="swatch-hex">#1D231E</p><p class="swatch-role">Primary text — near-black with a green undertone.</p></div></div>
+      <div class="swatch"><div class="swatch-fill" style="background:#4C6A57"></div><div class="swatch-body"><p class="swatch-name">Moss</p><p class="swatch-hex">#4C6A57</p><p class="swatch-role">Primary brand color — structure, healthy status, primary actions.</p></div></div>
+      <div class="swatch"><div class="swatch-fill" style="background:#28392E"></div><div class="swatch-body"><p class="swatch-name">Moss deep</p><p class="swatch-hex">#28392E</p><p class="swatch-role">Darkest moss — the philosophy section background, strong text.</p></div></div>
+      <div class="swatch"><div class="swatch-fill" style="background:#D2DDCC"></div><div class="swatch-body"><p class="swatch-name">Moss pale</p><p class="swatch-hex">#D2DDCC</p><p class="swatch-role">Light fills — "on track" badges, dots at rest.</p></div></div>
+      <div class="swatch"><div class="swatch-fill" style="background:#95462A"></div><div class="swatch-body"><p class="swatch-name">Rust</p><p class="swatch-hex">#95462A</p><p class="swatch-role">The one accent. Reserved for flags and things that need attention.</p></div></div>
+    </div>
+
+    <div class="avoid-box" style="margin-top:32px;">
+      <p class="tag">What this replaced</p>
+      <p style="font-size:13.5px; color:var(--ink-soft);">The first version paired a warm cream base with a terracotta accent and a high-contrast serif — a combination common enough in AI-generated design that it reads as a template rather than a choice.</p>
+      <div class="avoid-compare">
+        <div>
+          <h4>Before</h4>
+          <p><span class="swatch-mini" style="background:#F7F4ED"></span>Cream #F7F4ED</p>
+          <p><span class="swatch-mini" style="background:#C1673F"></span>Clay-orange #C1673F</p>
+        </div>
+        <div>
+          <h4>After</h4>
+          <p><span class="swatch-mini" style="background:#EDF0E9"></span>Mist #EDF0E9</p>
+          <p><span class="swatch-mini" style="background:#95462A"></span>Rust #95462A</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <p class="label">Type</p>
+    <h2>A warm serif for headings, a plain sans for everything dense.</h2>
+    <p class="lead">Fraunces carries the brand's personality without sliding into softness. Inter stays out of the way on data-heavy screens — rosters, referral maps, anything with real information to scan.</p>
+
+    <div>
+      <div class="type-row">
+        <span class="glyph">Aa</span>
+        <div class="meta"><strong>Fraunces, weight 500</strong><br>Headings only. Used with restraint — never for body copy or UI labels.</div>
+      </div>
+      <div class="type-row sans">
+        <span class="glyph">Aa</span>
+        <div class="meta"><strong>Inter, weight 400 / 500</strong><br>Body copy, captions, buttons, form labels — every dense or functional surface.</div>
+      </div>
+    </div>
+
+    <table class="scale-table">
+      <tr><td>Hero heading</td><td>Fraunces 500, 52px</td></tr>
+      <tr><td>Section heading</td><td>Fraunces 500, 27–30px</td></tr>
+      <tr><td>Card heading</td><td>Fraunces 500, 17–22px</td></tr>
+      <tr><td>Body</td><td>Inter 400, 14.5–16px</td></tr>
+      <tr><td>Caption / eyebrow</td><td>Inter 500–600, 11–13px, uppercase, letter-spaced</td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <p class="label">Mark</p>
+    <h2>Reeds, or a sparkline — read either way.</h2>
+    <p class="lead">Four uneven vertical strokes. As a wetland mark, they're reeds. As a data mark, they're the exact shape the cadence-tracking feature draws on screen.</p>
+
+    <div class="mark-grid">
+      <div class="mark-card">
+        <svg width="60" height="44" viewBox="0 0 40 32" aria-hidden="true">
+          <rect x="2" y="14" width="4" height="16" rx="2" fill="#4C6A57"/>
+          <rect x="12" y="6" width="4" height="24" rx="2" fill="#95462A"/>
+          <rect x="22" y="18" width="4" height="12" rx="2" fill="#4C6A57"/>
+          <rect x="32" y="2" width="4" height="28" rx="2" fill="#28392E"/>
+        </svg>
+        <div class="mark-lockup"><span class="mk">fen</span></div>
+        <p>Primary lockup — mark and wordmark together, used in navigation.</p>
+      </div>
+      <div class="mark-card dark">
+        <svg width="60" height="44" viewBox="0 0 40 32" aria-hidden="true">
+          <rect x="2" y="14" width="4" height="16" rx="2" fill="#D2DDCC"/>
+          <rect x="12" y="6" width="4" height="24" rx="2" fill="#EDF0E9"/>
+          <rect x="22" y="18" width="4" height="12" rx="2" fill="#D2DDCC"/>
+          <rect x="32" y="2" width="4" height="28" rx="2" fill="#EDF0E9"/>
+        </svg>
+        <div class="mark-lockup"><span class="mk" style="color:var(--ivory)">fen</span></div>
+        <p>Reversed, for dark surfaces like the philosophy section.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <p class="label">Voice</p>
+    <h2>State the fact. Skip the affirmation.</h2>
+    <p class="lead">This is a tool for a business owner making decisions, not a client-facing wellness surface. No therapy-speak, no exclamation points.</p>
+
+    <div class="voice-grid">
+      <div class="no"><p class="tag">Avoid</p><p class="ex">"Let's check in on your caring circle! 💛"</p></div>
+      <div class="yes"><p class="tag">Use</p><p class="ex">"3 clients haven't rebooked in 30 days."</p></div>
+      <div class="no"><p class="tag">Avoid</p><p class="ex">"You're doing amazing, keep nurturing those connections!"</p></div>
+      <div class="yes"><p class="tag">Use</p><p class="ex">"Dr. Mehta sent 3 referrals — last update was 61 days ago."</p></div>
+      <div class="no"><p class="tag">Avoid</p><p class="ex">"Oops! Looks like something went wrong on our end."</p></div>
+      <div class="yes"><p class="tag">Use</p><p class="ex">"Couldn't save that change. Try again."</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" style="border-bottom:none;">
+  <div class="wrap">
+    <p class="label">Usage</p>
+    <h2>The small components everything else is built from.</h2>
+    <p class="lead">These patterns already exist on the live site — this is just the reference so new screens stay consistent with them.</p>
+
+    <div class="comp-row">
+      <span class="comp-label">Status badges</span>
+      <span class="badge ontrack">On track</span>
+      <span class="badge slipping">Slipping</span>
+      <span class="badge silent">Silent</span>
+    </div>
+    <div class="comp-row">
+      <span class="comp-label">Toggle buttons</span>
+      <span class="btn active">By relationship</span>
+      <span class="btn">A–Z</span>
+    </div>
+    <div class="comp-row">
+      <span class="comp-label">Dot states</span>
+      <span><span class="dot-demo" style="background:var(--sage-pale); border:1.5px solid var(--sage);"></span>Healthy</span>
+      &nbsp;&nbsp;
+      <span><span class="dot-demo" style="background:var(--terra); border:1.5px solid var(--terra-deep);"></span>Drifting</span>
+      &nbsp;&nbsp;
+      <span><span class="dot-demo" style="background:var(--sage-pale); border:2px solid var(--terra);"></span>Flagged</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="wordmark"><span class="mark">fen</span></div>
+    <span class="note">Brand kit v1 — update as the product changes, not the other way around.</span>
+  </div>
+</footer>
+
+</body>
+</html>
